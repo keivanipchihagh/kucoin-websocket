@@ -5,6 +5,7 @@ from apscheduler.schedulers.background import BackgroundScheduler
 
 # Third-party imports
 from .ws import ReconnectingWebsocket
+from .utils import get_or_create_eventloop
 
 
 class KucoinSocketManager():
@@ -26,7 +27,7 @@ class KucoinSocketManager():
         self._callback = callback
         self._timeframe = timeframe
         self._backoff_factor = backoff_factor
-        self._loop = asyncio.get_event_loop()                       # Create the main event loop
+        self._loop = get_or_create_eventloop()                      # Create the main event loop
         self._conn = ReconnectingWebsocket(self._loop, self._recv)  # Create the websocket
 
         # Automatically refresh token to keep connection to server alive
