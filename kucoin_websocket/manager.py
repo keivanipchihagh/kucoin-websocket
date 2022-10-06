@@ -1,18 +1,20 @@
 # Standard imports
 import asyncio
+from typing import Callable
 from apscheduler.schedulers.background import BackgroundScheduler
 
 # Third-party imports
-from ws import ReconnectingWebsocket
+from .ws import ReconnectingWebsocket
 
 
 class KucoinSocketManager():
 
-    def __init__(self, markets: list, timeframe: str = "5min", refresh_hours: int = 12, backoff_factor: float = 0.1) -> None:
+    def __init__(self, callback: Callable, markets: list, timeframe: str = "5min", refresh_hours: int = 12, backoff_factor: float = 0.1) -> None:
         """
             Initialise the IdexSocketManager
 
             Parameters:
+                callback (Callable): callback function that receives messages from the socket
                 markets (list): List of markets to subscribe to
                 timeframe (str): Timeframe to subscribe to
                 refresh_hours (int): How often to refresh the WebSocket details
@@ -20,11 +22,12 @@ class KucoinSocketManager():
         """
 
         self._conn = None
-        self.markets = markets
+        self._markets = markets
+        self._callback = callback
         self._timeframe = timeframe
-        self.backoff_factor = backoff_factor
-        self.loop = asyncio.get_event_loop()                        # Create the main event loop
-        self._conn = ReconnectingWebsocket(self.loop, self._recv)   # Create the websocket
+        self._backoff_factor = backoff_factor
+        self._loop = asyncio.get_event_loop()                       # Create the main event loop
+        self._conn = ReconnectingWebsocket(self._loop, self._recv)  # Create the websocket
 
         # Automatically refresh token to keep connection to server alive
         self.scheduler = BackgroundScheduler()
@@ -39,7 +42,7 @@ class KucoinSocketManager():
     async def _recv(self, msg: dict) -> None:
         """ Mirror data messages to the callback """
         if 'data' in msg:
-            await self.__receive(msg)
+            await self._callback(msg)
 
 
     async def subscribe_kline(self, market: str) -> None:
@@ -56,7 +59,7 @@ class KucoinSocketManager():
         sub_wait = 0.5                              # Start with 0.5 second wait
         for market in markets:            
             await asyncio.sleep(sub_wait)           # Sleep
-            sub_wait *= self.backoff_factor         # Increase wait time for each subscription
+            sub_wait *= self._backoff_factor        # Increase wait time for each subscription
             await self.subscribe_kline(market)      # Subscribe
 
 
@@ -74,27 +77,21 @@ class KucoinSocketManager():
         sub_wait = 0.5                              # Start with 0.5 second wait
         for market in markets:            
             await asyncio.sleep(sub_wait)           # Sleep
-            sub_wait *= self.backoff_factor         # Increase wait time for each subscription
+            sub_wait *= self._backoff_factor        # Increase wait time for each subscription
             await self.unsubscribe_kline(market)    # Unsubscribe
-
-
-    async def __receive(self, msg: dict) -> None:
-        """ callback function that receives messages from the socket """
-        if "candles" in msg["topic"]:
-            print(f"{msg['data']}")
 
 
     def run(self) -> None:
         """ Start the websocket main event loop and schedulers """        
         self.scheduler.start()                          # Start the scheduler
-        self.loop.run_until_complete(self.__main())     # Start the main event loop
+        self._loop.run_until_complete(self.__main())    # Start the main event loop
 
 
     async def __main(self) -> None:
         """ Main event loop """
 
         # Subscribe markets to Kline channels
-        await self.subscribe_kline_bulk(self.markets)
+        await self.subscribe_kline_bulk(self._markets)
 
         # Sleep to keep the event loop alive
         while True:

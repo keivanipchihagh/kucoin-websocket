@@ -7,7 +7,7 @@ from datetime import datetime
 from asyncio import AbstractEventLoop
 
 # Third-party imports
-from base_request import BaseRequests
+from .base_request import BaseRequests
 
 
 class KuCoinWebSocketDetails():
