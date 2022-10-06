@@ -90,7 +90,6 @@ class KucoinWebSocket():
         self._loop.run_until_complete(self.__main())    # Start the main event loop
 
 
-
     async def __main(self) -> None:
         """ Main event loop """
 
