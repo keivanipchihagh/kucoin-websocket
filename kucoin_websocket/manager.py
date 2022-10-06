@@ -4,9 +4,8 @@ from typing import Callable
 from apscheduler.schedulers.background import BackgroundScheduler
 
 # Third-party imports
-from .threads import ThreadPool
-from .ws import ReconnectingWebsocket
-from .utils import get_or_create_eventloop
+from .ws import Websocket
+from .utils.threads import ThreadPool
 
 
 class KucoinWebSocket():
@@ -77,8 +76,8 @@ class KucoinWebSocket():
     def run(self) -> None:
         """ Start the websocket main event loop and schedulers """
 
-        self._loop = get_or_create_eventloop()                      # Create the main event loop
-        self._conn = ReconnectingWebsocket(self._loop, self._recv)  # Create the websocket
+        self._loop = self.get_or_create_eventloop()                 # Create the main event loop
+        self._conn = Websocket(self._loop, self._recv)  # Create the websocket
 
         # Automatically refresh token to keep connection to server alive
         self._scheduler.add_job(
@@ -99,12 +98,21 @@ class KucoinWebSocket():
         # Sleep to keep the event loop alive
         while True:
             await asyncio.sleep(30)
+    
+
+    def get_or_create_eventloop(self) -> asyncio.AbstractEventLoop:
+        """ Gets or creates an event loop. A new loop is created if ran from inside a thread """
+        try:
+            return asyncio.get_event_loop()
+        except RuntimeError:
+            asyncio.set_event_loop(asyncio.new_event_loop())
+            return asyncio.get_event_loop()
 
 
 
 class KucoinWebSocketManager():
 
-    MAX_SUBSCRIPTIONS = 200     # KuCoin supports up to 300 subscriptions per connection
+    MAX_SUBS = 250     # KuCoin supports up to 300 subscriptions per connection
 
     def __init__(self, callback: Callable, markets: list, timeframe: str = "5min", refresh_hours: int = 12, backoff_factor: float = 0.1) -> None:
         """
@@ -117,10 +125,19 @@ class KucoinWebSocketManager():
                 refresh_hours (int): How often to refresh the WebSocket details
                 backoff_factor (float): Backoff factor for subscribing to the WebSocket
         """
+        self.callback = callback
+        self.markets = markets
+        self.timeframe = timeframe
+        self.refresh_hours = refresh_hours
+        self.backoff_factor = backoff_factor
 
-        self.thread_pool = ThreadPool(
-            confs = {f"worker {i // self.MAX_SUBSCRIPTIONS}": (KucoinWebSocket(callback, markets[i: i + self.MAX_SUBSCRIPTIONS], timeframe, refresh_hours, backoff_factor).run, ()) for i in range(0, len(markets), self.MAX_SUBSCRIPTIONS)}
-        )
+        confs = {f"worker {i}": (self.create_websocket(markets[i * self.MAX_SUBS: (i + 1) * self.MAX_SUBS]).run, ()) for i in range(0, len(markets), self.MAX_SUBS)}
+        self.thread_pool = ThreadPool(confs)
+
+
+    def create_websocket(self, markets: list) -> KucoinWebSocket:
+        """ Returns a new websocket instance """
+        return KucoinWebSocket(self.callback, markets, self.timeframe, self.refresh_hours, self.backoff_factor)
 
 
     def start(self) -> None:

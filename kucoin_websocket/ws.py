@@ -6,7 +6,7 @@ from typing import Callable
 from datetime import datetime
 
 # Third-party imports
-from .base_request import BaseRequests
+from .utils.base_request import BaseRequests
 
 
 class KuCoinWebSocketDetails():
@@ -54,8 +54,7 @@ class KuCoinWebSocketDetails():
 
 
 
-
-class ReconnectingWebsocket():
+class Websocket():
 
     MAX_RECONNECTS = 5  # Maximum number of retries before giving up
 
@@ -78,6 +77,7 @@ class ReconnectingWebsocket():
 
     def refresh_ws_details(self) -> None:
         """ Refreshes the WebSocket details. The is essential for the WebSocket to stay connected in case the old token expires """
+        print(f"[DEBUG - {self.now}] Refreshing WebSocket details")
         self._ws_details = KuCoinWebSocketDetails.create()
 
 
