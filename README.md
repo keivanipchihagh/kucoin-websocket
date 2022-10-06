@@ -1,7 +1,7 @@
 # kucoin-websocket
-Multi-threaded KuCoin WebSocket with self-management mechanisms to ensure stable streaming at all times. More control and abstraction that the native [kucoin-python-sdk](https://github.com/Kucoin/kucoin-python-sdk).
+Multi-threaded KuCoin WebSocket with self-management mechanisms to ensure stable streaming at all times. More control and abstraction than the native [kucoin-python-sdk](https://github.com/Kucoin/kucoin-python-sdk).
 > **Note**
-> This package is still under development and might not contain the full functionality described under [KuCoin documentation](https://docs.kucoin.com/#websocket-feed)!
+> This package is still under development and probably will not contain the full functionality described under [KuCoin documentation](https://docs.kucoin.com/#websocket-feed)!
 
 ## Features
 ### Subscription Strategy
@@ -20,4 +20,4 @@ KuCoin has a limitation of the number of active subscriptions which is 300 at th
 - [python-kucoin](https://github.com/sammchardy/python-kucoin) by sammchardy
 
 ## Contribution
-Your contributions are always welcome!
+Your contributions are welcomed, as always!
