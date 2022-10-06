@@ -1,5 +1,4 @@
 APScheduler==3.9.1
-backports.zoneinfo==0.2.1
 certifi==2022.9.24
 charset-normalizer==2.1.1
 idna==3.4

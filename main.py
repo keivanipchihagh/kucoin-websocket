@@ -1,5 +1,8 @@
 # Third-party imports
-from kucoin_websocket.manager import KucoinSocketManager
+from kucoin_websocket.manager import KucoinWebSocketManager
+
+# Constants
+MARKETS = ["BTC-USDT", "ETH-USDT", "BNB-USDT", "TRX-USDT", "DOGE-USDT"]
 
 
 async def receive( msg: dict) -> None:
@@ -8,13 +11,12 @@ async def receive( msg: dict) -> None:
         print(f"{msg['data']}")
 
 
-
 if __name__ == "__main__":
 
-    ksm = KucoinSocketManager(
+    ksm = KucoinWebSocketManager(
         callback = receive,
-        markets = ["BTC-USDT", "ETH-USDT", "BNB-USDT"],
+        markets = MARKETS,
         timeframe = "1min",
         refresh_hours = 12
     )
-    ksm.run()
+    ksm.start()

@@ -4,7 +4,6 @@ from random import random
 import asyncio, time, json
 from typing import Callable
 from datetime import datetime
-from asyncio import AbstractEventLoop
 
 # Third-party imports
 from .base_request import BaseRequests
@@ -58,10 +57,9 @@ class KuCoinWebSocketDetails():
 
 class ReconnectingWebsocket():
 
-    MAX_RECONNECTS = 5
-    MAX_RECONNECT_SECONDS = 60
+    MAX_RECONNECTS = 5  # Maximum number of retries before giving up
 
-    def __init__(self, loop: AbstractEventLoop, coro: Callable) -> None:
+    def __init__(self, loop: asyncio.AbstractEventLoop, coro: Callable) -> None:
         self._loop = loop
         self._coro = coro
         self._reconnect_attempts = 0
