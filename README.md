@@ -1,5 +1,7 @@
 # kucoin-websocket
-Multi-threaded KuCoin WebSocket with self-management mechanisms to ensure stable streaming at all times.
+Multi-threaded KuCoin WebSocket with self-management mechanisms to ensure stable streaming at all times. More control and abstraction that the native [kucoin-python-sdk](https://github.com/Kucoin/kucoin-python-sdk).
+> **Note**
+> This package is still under development and might not contain the full functionality described under [KuCoin documentation](https://docs.kucoin.com/#websocket-feed)!
 
 ## Features
 ### Subscription Strategy
@@ -12,4 +14,10 @@ There are numerous errors that can occure during the stream ([KuCoin errors](htt
 Currently, KuCoin tokens expire after **24 hours** ([KuCoin FAQ](https://docs.kucoin.com/#faq)) and the stream is stopped. To overcome this, WebSocket details like *token* and *endpoint* are renewed after an interval, so that the connection stays alive at all time. Default interval is set to **12 hours** to leave no room for error.
 
 ### Active Subscriptions
-KuCoin has a limitation of the number of active subscriptions which is 300 at the time ([KuCoin FAQ](https://docs.kucoin.com/#faq)). To solve the issue, multiple WebSockets are automatically created on different threads that run in parallel and hold at most 250 subscriptions (*let's not mess with the limitation!*).
+KuCoin has a limitation of the number of active subscriptions which is 300 at the time ([KuCoin FAQ](https://docs.kucoin.com/#faq)). To solve the issue, multiple WebSockets are automatically created on different threads that run in parallel and hold at most 250 subscriptions (*better not challenge the limitation!*).
+
+## Credits
+- [python-kucoin](https://github.com/sammchardy/python-kucoin) by sammchardy
+
+## Contribution
+Your contributions are always welcome!
