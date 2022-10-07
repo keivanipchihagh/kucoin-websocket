@@ -143,3 +143,4 @@ class KucoinWebSocketManager():
     def start(self) -> None:
         """ Runs the thread pool """
         self.thread_pool.start()
+        self.thread_pool.join()

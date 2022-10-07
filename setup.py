@@ -12,13 +12,13 @@ with open('requirements.txt') as f:
 
 setup(
     name = "kucoin_websocket",                                      # This is the name of the package
-    version = "1.0.1",                                              # The initial release version
+    version = "1.0.3",                                              # The initial release version
     author = "Keivan Ipchi Hagh",                                   # Full name of the author
     url = "https://github.com/keivanipchihagh/kucoin-websocket",    # URL to the github repository
     description = "Faster deployment is what we want!",
     long_description = long_description,                            # Long description read from the the readme file
     long_description_content_type = "text/markdown",
-    packages = find_namespace_packages(include = ["kucoin_websocket"]),     # List of all python modules to be installed
+    packages = find_namespace_packages(include = ["kucoin_websocket", "kucoin_websocket.*"]),     # List of all python modules to be installed
     classifiers = [
         "Programming Language :: Python :: 3",
         "License :: OSI Approved :: MIT License",

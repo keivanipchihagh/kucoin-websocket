@@ -1,0 +1,29 @@
+version: "3.7"
+
+services:
+
+  # KuCoin Collector
+  collector-kucoin:
+    container_name: collectors-kucoin
+    image: collectors-kucoin
+    restart: always
+
+    build:
+      context: ..
+      dockerfile: deploy/Dockerfile
+
+    command:
+      - python3
+      - -u
+      - main.py
+
+    networks:
+      - dejavu
+      - epd
+
+
+networks:
+  dejavu:
+    external: true
+  epd:
+    external: true
